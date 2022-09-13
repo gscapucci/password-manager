@@ -1,4 +1,3 @@
-from asyncore import write
 from hashlib import sha256
 import sys
 
@@ -115,4 +114,4 @@ class PasswordManager:
 
 
 if __name__ == '__main__':
-    pm = PasswordManager()
+    pass
