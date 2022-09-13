@@ -59,12 +59,12 @@ class PasswordManager:
             elif input_text == 'add':
                 username :str = input('Username: ')
                 if ord(username[0]) == 27:
-                    break
+                    sys.exit(1)
                 if username in splited_file:
                     raise Exception('Username already used')
                 password :str = input('Password: ')
                 if ord(password[0]) == 27:
-                    break
+                    sys.exit(1)
                 splited_file.append(username)
                 splited_file.append(password)
             elif input_text == 'list':
@@ -76,6 +76,22 @@ class PasswordManager:
                     else:
                         text += '\n'
                     print(text, end='')
+            elif input_text == 'remove':
+                username :str = input('Username: ')
+                if ord(username[0]) == 27:
+                    sys.exit(1)
+                if username in splited_file:
+                    i = splited_file.index(username)
+                    password :str = getpass.getpass('Password: ')
+                    hexpass :str = ''
+                    for i in sha256(password.encode()).digest():
+                        hexpass += self.__decimal_byte_to_hex(i)
+                    if hexpass != splited_file[i + 1]:
+                        raise Exception('Worng password')
+                    splited_file.remove(username)
+                    splited_file.remove(splited_file[i + 1])
+            elif input_text == 'update':
+                raise Exception('Unimplemented')
         password_file = open('passwords.txt', 'r+')
         for i in range(len(splited_file)):
             text :str = splited_file[i]
