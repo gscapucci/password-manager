@@ -40,7 +40,7 @@ class PasswordManager:
             hexpass_str += self.__decimal_byte_to_hex(i)
         adm_file.write(username + ' ' + hexpass_str)
 
-    def __access(self):
+    def __access(self) -> None:
         is_running = True
         password_file = open('passwords.txt', 'r+')
         splited_file = password_file.read().split()
