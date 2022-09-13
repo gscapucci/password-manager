@@ -1,4 +1,5 @@
 from hashlib import sha256
+import getpass
 import sys
 
 class PasswordManager:
@@ -31,9 +32,14 @@ class PasswordManager:
         username :str = input('Username: ')
         if ord(username[0]) == 27:
             sys.exit(1)
-        password :str = input('Password: ')
-        if ord(username[0]) == 27:
+        password :str = getpass.getpass('Password: ')
+        if ord(password[0]) == 27:
             sys.exit(1)
+        confirm_password :str = getpass.getpass('Confirm Password: ')
+        if ord(confirm_password[0]) == 27:
+            sys.exit(1)
+        if confirm_password != password:
+            raise Exception('password and confirmation are different')
         adm_file = open('adm.txt', 'w')
         hexpass_str :str = ''
         for i in sha256(password.encode()).digest():
@@ -99,7 +105,7 @@ class PasswordManager:
                 raise Exception("Invalid input")
             if ord(username[0]) == 27:
                 sys.exit(1)
-            password :str = input('Password: ')
+            password :str = getpass.getpass('Password: ')
             if ord(password[0]) == 27:
                 sys.exit(1)
             if len(password) == 0:
@@ -111,6 +117,8 @@ class PasswordManager:
                 if binpass_str == splited_file[1]:
                     self.__access()
                     sys.exit(0)
+                else:
+                    print('Wrong username or password')
 
 
 if __name__ == '__main__':
