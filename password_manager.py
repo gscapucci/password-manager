@@ -1,7 +1,10 @@
+from asyncore import write
 from hashlib import sha256
+import sys
+
 class PasswordManager:
 
-    def decimal_byte_to_binary(self, number: int) -> str:
+    def __decimal_byte_to_binary(self, number: int) -> str:
         num :str = ''
         while number > 0:
             num += str(number % 2)
@@ -10,73 +13,106 @@ class PasswordManager:
             num += '0'
         return num[::-1]
 
-    def decimal_byte_to_hex(self, number: int) -> str:
+    def __decimal_byte_to_hex(self, number: int) -> str:
         num :str = ''
         letter :list = ['a', 'b', 'c', 'd', 'e', 'f']
+        if number == 0:
+            num += '0'
         while number > 0:
             res = number % 16
-            if number < 10:
+            number = number // 16
+            if res < 10:
                 num += str(res)
             else:
                 num += letter[res - 10]
         return num[::-1]
 
-    def setUserAndPass(self) -> None:
-        print("Set username and password:")
+    def __setUserAndPass(self) -> None:
+        print("Set username and password (Exit: <Esc+Enter>):")
         username :str = input('Username: ')
+        if ord(username[0]) == 27:
+            sys.exit(1)
         password :str = input('Password: ')
+        if ord(username[0]) == 27:
+            sys.exit(1)
         adm_file = open('adm.txt', 'w')
-        binpass_str :str = ''
+        hexpass_str :str = ''
         for i in sha256(password.encode()).digest():
-            binpass_str += self.decimal_byte_to_binary(i)
-        adm_file.write(username + ' ' + binpass_str)
+            hexpass_str += self.__decimal_byte_to_hex(i)
+        adm_file.write(username + ' ' + hexpass_str)
 
-    def access(self):
+    def __access(self):
         is_running = True
+        password_file = open('passwords.txt', 'r+')
+        splited_file = password_file.read().split()
+        password_file.truncate()
+        password_file.close()
         while is_running:
             input_text = input('PM > ')
             if input_text == 'exit':
                 is_running = False
+            elif input_text == 'add':
+                username :str = input('Username: ')
+                if ord(username[0]) == 27:
+                    break
+                if username in splited_file:
+                    raise Exception('Username already used')
+                password :str = input('Password: ')
+                if ord(password[0]) == 27:
+                    break
+                splited_file.append(username)
+                splited_file.append(password)
+            elif input_text == 'list':
+                print('Username | Password')
+                for i in range(len(splited_file)):
+                    text :str = splited_file[i]
+                    if i % 2 == 0:
+                        text += ' | '
+                    else:
+                        text += '\n'
+                    print(text, end='')
+        password_file = open('passwords.txt', 'r+')
+        for i in range(len(splited_file)):
+            text :str = splited_file[i]
+            if i % 2 == 0:
+                text += ' '
+            else:
+                text += '\n'
+            password_file.write(text)
+        password_file.close()
 
     def start(self) -> None:
-        adm_file = open('adm.txt')
+        adm_file = open('adm.txt', 'w+')
         pass_file_str :str = adm_file.read()
         adm_file.close()
         if len(pass_file_str) == 0:
-            self.setUserAndPass()
+            password_file = open('passwords.txt', 'w')
+            password_file.close()
+            self.__setUserAndPass()
             
-        print("Log in:")
+        print("Log in (Exit: <Esc+Enter>):")
         adm_file = open('adm.txt')
         pass_file_str = adm_file.readline()
         splited_file = pass_file_str.split()
-        username :str = input('Username: ')
-        password :str = input('Password: ')
-        if splited_file[0] == username:
-            binpass_str :str = ''
-            for i in sha256(password.encode()).digest():
-                binpass_str += self.decimal_byte_to_binary(i)
-            if binpass_str == splited_file[1]:
-                self.access()
-
+        while True:
+            username :str = input('Username: ')
+            if len(username) == 0:
+                raise Exception("Invalid input")
+            if ord(username[0]) == 27:
+                sys.exit(1)
+            password :str = input('Password: ')
+            if ord(password[0]) == 27:
+                sys.exit(1)
+            if len(password) == 0:
+                raise Exception("Invalid input")
+            if splited_file[0] == username:
+                binpass_str :str = ''
+                for i in sha256(password.encode()).digest():
+                    binpass_str += self.__decimal_byte_to_hex(i)
+                if binpass_str == splited_file[1]:
+                    self.__access()
+                    sys.exit(0)
 
 
 if __name__ == '__main__':
     pm = PasswordManager()
-    print(pm.decimal_byte_to_hex(0))
-    print(pm.decimal_byte_to_hex(1))
-    print(pm.decimal_byte_to_hex(2))
-    print(pm.decimal_byte_to_hex(3))
-    print(pm.decimal_byte_to_hex(4))
-    print(pm.decimal_byte_to_hex(5))
-    print(pm.decimal_byte_to_hex(6))
-    print(pm.decimal_byte_to_hex(7))
-    print(pm.decimal_byte_to_hex(8))
-    print(pm.decimal_byte_to_hex(9))
-    print(pm.decimal_byte_to_hex(10))
-    print(pm.decimal_byte_to_hex(11))
-    print(pm.decimal_byte_to_hex(12))
-    print(pm.decimal_byte_to_hex(13))
-    print(pm.decimal_byte_to_hex(14))
-    print(pm.decimal_byte_to_hex(15))
-    print(pm.decimal_byte_to_hex(16))
-    print(pm.decimal_byte_to_hex(17))

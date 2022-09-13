@@ -1,4 +1,3 @@
-from ast import Pass
 from password_manager import PasswordManager
 
 if __name__ == '__main__':
